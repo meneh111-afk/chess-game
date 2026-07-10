@@ -8,6 +8,10 @@ class Game {
     this.selectedSquare = null; // [row, col] ou null
     this.moveHistory = []; // liste de chaînes lisibles, ex: "e2-e4"
     this.capturedPieces = { white: [], black: [] }; // pièces capturées par couleur adverse
+    // Type de la dernière pièce de chaque couleur à avoir capturé une pièce
+    // adverse (ex: 'knight'), utilisé pour afficher son portrait. null si
+    // cette couleur n'a encore rien capturé.
+    this.lastCapturingPiece = { white: null, black: null };
     this.isGameOver = false;
     this.statusMessage = '';
   }
@@ -70,6 +74,7 @@ class Game {
     const captured = this.board.movePiece(fromRow, fromCol, toRow, toCol);
     if (captured) {
       this.capturedPieces[captured.color].push(captured);
+      this.lastCapturingPiece[piece.color] = piece.type;
     }
 
     this.moveHistory.push(notation);
@@ -99,6 +104,9 @@ class Game {
   }
 
   _toNotation(piece, fromRow, fromCol, toRow, toCol) {
+    if (piece.type === 'king' && Math.abs(toCol - fromCol) === 2) {
+      return toCol > fromCol ? 'O-O' : 'O-O-O';
+    }
     const files = 'abcdefgh';
     const from = files[fromCol] + (8 - fromRow);
     const to = files[toCol] + (8 - toRow);
@@ -111,6 +119,7 @@ class Game {
     this.selectedSquare = null;
     this.moveHistory = [];
     this.capturedPieces = { white: [], black: [] };
+    this.lastCapturingPiece = { white: null, black: null };
     this.isGameOver = false;
     this.statusMessage = '';
   }

@@ -10,6 +10,14 @@ const restartBtn = document.getElementById('restart-btn');
 const rankLabelsEl = document.getElementById('rank-labels');
 const fileLabelsEl = document.getElementById('file-labels');
 
+// Un piece "vide" par type, juste pour récupérer son glyphe d'affichage
+// (aucune règle de déplacement n'est utilisée ici).
+const PIECE_CLASSES = { pawn: Pawn, rook: Rook, knight: Knight, bishop: Bishop, queen: Queen, king: King };
+
+function capitalize(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
 function renderCoordinates() {
   const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
   for (let rank = 8; rank >= 1; rank--) {
@@ -134,7 +142,7 @@ function onSquareClick(row, col) {
 }
 
 function renderTurnIndicator() {
-  turnTextEl.textContent = `Tour : ${game.currentTurn === 'white' ? 'Blancs' : 'Noirs'}`;
+  turnTextEl.textContent = `The Move Belongs To : ${game.currentTurn === 'white' ? 'White' : 'Black'}`;
 }
 
 function renderStatus() {
@@ -160,12 +168,54 @@ function renderCaptured() {
     .join('');
 }
 
+// Affiche, sous chaque plateau de pièces tombées, un médaillon représentant
+// la pièce qui a porté le dernier coup pour ce camp (glyphe par défaut,
+// remplacé automatiquement par une image si IMAGE/Pieces/{color}-{type}.png
+// existe).
+function renderCapturers() {
+  for (const color of ['white', 'black']) {
+    const type = game.lastCapturingPiece[color];
+    const badgeEl = document.getElementById(`capturer-${color}`);
+    const photoEl = document.getElementById(`capturer-${color}-photo`);
+    const glyphEl = document.getElementById(`capturer-${color}-glyph`);
+    const captionEl = document.getElementById(`capturer-${color}-caption`);
+    const backdropEl = document.getElementById(`backdrop-${color}`);
+
+    if (!type) {
+      badgeEl.classList.remove('visible');
+      backdropEl.classList.remove('visible');
+      continue;
+    }
+
+    badgeEl.classList.add('visible');
+
+    const PieceClass = PIECE_CLASSES[type];
+    glyphEl.textContent = PieceClass ? new PieceClass(color).glyph : '';
+    captionEl.textContent = capitalize(type);
+
+    const imageUrl = `IMAGE/Pieces/${color}-${type}.png`;
+    photoEl.classList.remove('loaded');
+    backdropEl.classList.remove('visible');
+    photoEl.onload = () => {
+      photoEl.classList.add('loaded');
+      backdropEl.style.backgroundImage = `url('${imageUrl}')`;
+      backdropEl.classList.add('visible');
+    };
+    photoEl.onerror = () => {
+      photoEl.classList.remove('loaded');
+      backdropEl.classList.remove('visible');
+    };
+    photoEl.src = imageUrl;
+  }
+}
+
 function renderAll() {
   renderBoard();
   renderTurnIndicator();
   renderStatus();
   renderHistory();
   renderCaptured();
+  renderCapturers();
 }
 
 restartBtn.addEventListener('click', () => {

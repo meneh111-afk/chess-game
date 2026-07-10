@@ -1,6 +1,3 @@
-// board.js
-// Représente le plateau 8x8 et la position des pièces.
-
 class Board {
   constructor() {
     this.grid = this._createEmptyGrid();
@@ -35,7 +32,6 @@ class Board {
     this.grid[row][col] = piece;
   }
 
-  // Déplace une pièce et retourne la pièce capturée (ou null).
   movePiece(fromRow, fromCol, toRow, toCol) {
     const piece = this.getPiece(fromRow, fromCol);
     const captured = this.getPiece(toRow, toCol);
@@ -44,9 +40,20 @@ class Board {
     this.grid[fromRow][fromCol] = null;
 
     if (piece) {
+      if (piece.type === 'king' && Math.abs(toCol - fromCol) === 2) {
+        const isKingSide = toCol > fromCol;
+        const rookFromCol = isKingSide ? 7 : 0;
+        const rookToCol = isKingSide ? toCol - 1 : toCol + 1;
+        const rook = this.grid[fromRow][rookFromCol];
+        if (rook) {
+          this.grid[fromRow][rookToCol] = rook;
+          this.grid[fromRow][rookFromCol] = null;
+          rook.hasMoved = true;
+        }
+      }
+
       piece.hasMoved = true;
 
-      // Promotion simple : un pion qui atteint la dernière rangée devient une Dame.
       if (piece.type === 'pawn') {
         const promotionRow = piece.color === 'white' ? 0 : 7;
         if (toRow === promotionRow) {
@@ -58,7 +65,6 @@ class Board {
     return captured;
   }
 
-  // Trouve la position [row, col] du roi d'une couleur donnée.
   findKing(color) {
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
@@ -71,13 +77,12 @@ class Board {
     return null;
   }
 
-  // Une case est-elle attaquée par une pièce de attackerColor ?
   isSquareAttacked(row, col, attackerColor) {
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
         const piece = this.grid[r][c];
         if (piece && piece.color === attackerColor) {
-          const moves = piece.getPossibleMoves(this, r, c);
+          const moves = piece.getAttackSquares(this, r, c);
           if (moves.some(([mr, mc]) => mr === row && mc === col)) {
             return true;
           }
@@ -87,7 +92,6 @@ class Board {
     return false;
   }
 
-  // Copie profonde du plateau (utile pour simuler un coup sans le jouer réellement).
   clone() {
     const newBoard = new Board();
     newBoard.grid = this._createEmptyGrid();

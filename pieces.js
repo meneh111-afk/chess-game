@@ -20,6 +20,14 @@ class Piece {
     return [];
   }
 
+  // Cases qu'une pièce menace, utilisées pour la détection d'échec.
+  // Par défaut identique à getPossibleMoves ; le Roi la surcharge pour
+  // exclure le roque (qui n'attaque jamais de case et provoquerait sinon
+  // une récursion infinie avec isSquareAttacked).
+  getAttackSquares(board, row, col) {
+    return this.getPossibleMoves(board, row, col);
+  }
+
   _slidingMoves(board, row, col, directions) {
     const moves = [];
     for (const [dr, dc] of directions) {
@@ -194,6 +202,18 @@ class King extends Piece {
   }
 
   getPossibleMoves(board, row, col) {
+    const moves = this._adjacentMoves(board, row, col);
+    moves.push(...this._getCastlingMoves(board, row, col));
+    return moves;
+  }
+
+  // Utilisée pour la détection d'échec : ne comprend jamais le roque,
+  // qui n'est pas un coup qui "menace" une case.
+  getAttackSquares(board, row, col) {
+    return this._adjacentMoves(board, row, col);
+  }
+
+  _adjacentMoves(board, row, col) {
     const moves = [];
     for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
@@ -208,6 +228,36 @@ class King extends Piece {
         }
       }
     }
+    return moves;
+  }
+
+  _getCastlingMoves(board, row, col) {
+    const moves = [];
+    if (this.hasMoved) return moves;
+
+    const opponent = this.color === 'white' ? 'black' : 'white';
+    if (board.isSquareAttacked(row, col, opponent)) return moves;
+
+    const kingSideRook = board.getPiece(row, 7);
+    if (kingSideRook && kingSideRook.type === 'rook' && !kingSideRook.hasMoved) {
+      const pathClear = !board.getPiece(row, 5) && !board.getPiece(row, 6);
+      const pathSafe = !board.isSquareAttacked(row, 5, opponent)
+        && !board.isSquareAttacked(row, 6, opponent);
+      if (pathClear && pathSafe) {
+        moves.push([row, 6]);
+      }
+    }
+
+    const queenSideRook = board.getPiece(row, 0);
+    if (queenSideRook && queenSideRook.type === 'rook' && !queenSideRook.hasMoved) {
+      const pathClear = !board.getPiece(row, 1) && !board.getPiece(row, 2) && !board.getPiece(row, 3);
+      const pathSafe = !board.isSquareAttacked(row, 2, opponent)
+        && !board.isSquareAttacked(row, 3, opponent);
+      if (pathClear && pathSafe) {
+        moves.push([row, 2]);
+      }
+    }
+
     return moves;
   }
 }

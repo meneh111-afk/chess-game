@@ -8,6 +8,7 @@ JavaScript, wrapped in a "royal candlelit salon" theme (gold, bronze, Cinzel).
 
 ![alt text](IMAGE/image.png)
 ![alt text](IMAGE/image-1.png)
+
 ## Features
 
 - 8x8 board generated dynamically in JavaScript
@@ -81,3 +82,16 @@ then open `http://localhost:8000`.
 - [Cinzel](https://fonts.google.com/specimen/Cinzel) and
   [EB Garamond](https://fonts.google.com/specimen/EB+Garamond) fonts via
   Google Fonts
+
+
+  ## New Feature
+
+  - Rock
+
+  ![alt text](IMAGE/rock1.png)
+
+  ![alt text](IMAGE/rockdone.png)
+
+  ![alt text](IMAGE/rockX2.png)
+
+  ![alt text](IMAGE/rocknote.png)
