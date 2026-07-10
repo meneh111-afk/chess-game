@@ -1,35 +1,99 @@
-# The Royal Game — Online Chess Game
+# Online Chess Game
 
 A 2-player chess game that runs entirely in the browser, with no backend:
 the board, rules, and interface are all built in plain, object-oriented
-JavaScript, wrapped in a "royal candlelit salon" theme (gold, bronze, Cinzel).
+JavaScript, wrapped in a royal theme (gold, bronze, Cinzel).
 
-## Preview
-
-![alt text](IMAGE/image.png)
-![alt text](IMAGE/image-1.png)
 
 ## Features
 
 - 8x8 board generated dynamically in JavaScript
 - Object-oriented piece classes (`Piece` as the base class, extended by
   `Pawn`, `Rook`, `Knight`, `Bishop`, `Queen`, `King`)
+![alt text](IMAGE/firstpannel.png)
+
 - Full per-piece movement rules (including pawn promotion to Queen)
+- Castling (kingside and queenside), with all standard safety checks
 - Check, checkmate, and stalemate (draw) detection
 - A player can never make a move that would leave their own king in check
 - Turn switching (White / Black)
+![alt text](IMAGE/turnswitch.png)
+
 - Move history panel
+![alt text](IMAGE/history.png)
+
 - Captured pieces displayed on dedicated trays
+![alt text](IMAGE/fallen.png)
+
 - Piece selection with legal-move and capture highlighting
+![alt text](IMAGE/legalmove.png)
+
 - Drag & drop (HTML5 Drag & Drop API), in addition to click-to-move
+
 - Board coordinates (a-h / 8-1) shown along the edges
+
 - "New Game" button to restart
+![alt text](IMAGE/newgame.png)
+
 - Custom visual theme (gold/bronze palette, Cinzel typeface, ornate frame)
-- Responsive layout (adapts to mobile screens)
+
+
+## Castling
+
+Both kingside (`O-O`) and queenside (`O-O-O`) castling are implemented, with
+the full standard rule set:
+
+- Neither the king nor the chosen rook has moved yet
+- No pieces stand between the king and the rook
+- The king is not currently in check
+- The king does not pass through, or land on, a square attacked by the
+  opponent
+
+![alt text](IMAGE/rock1.png)
+*Before castling — king and rook still in their starting position.*
+
+![alt text](IMAGE/rockdone.png)
+*After castling — the king has moved two squares and the rook has jumped to
+the other side of it.*
+
+![alt text](IMAGE/rockX2.png)
+*Castling on the other side (kingside vs. queenside).*
+
+![alt text](IMAGE/rocknote.png)
+*Detail: the move is only offered when it's actually legal (king and rook
+haven't moved, path is clear, king isn't in or passing through check).*
+
+## Visual customization
+
+
+![alt text](IMAGE/image.png)
+
+
+![alt text](IMAGE/image-1.png)
+
+
+![adding some picts](IMAGE/pictadd.png)
+Below each "Fallen" tray, a medallion shows the piece that struck the last
+blow for that side, and a large themed image can fill the empty margins on
+each side of the screen.
+
+By default both use a built-in vector glyph. To use your own artwork
+instead, drop PNG files into `IMAGE/Pieces/` following this exact naming
+convention:
+
+```
+white-pawn.png    black-pawn.png
+white-knight.png  black-knight.png
+white-bishop.png  black-bishop.png
+white-rook.png    black-rook.png
+white-queen.png   black-queen.png
+white-king.png    black-king.png
+```
+
+If a file is missing, the game falls back to the vector glyph automatically. Nothing breaks
 
 ## Known limitations / future improvements
 
-- Castling is not implemented
 - En passant is not implemented
 - No choice of promotion piece (always promotes to Queen)
 - No game save between sessions
@@ -43,7 +107,9 @@ JavaScript, wrapped in a "royal candlelit salon" theme (gold, bronze, Cinzel).
 ├── pieces.js     Piece classes and their movement rules (OOP)
 ├── board.js      Board class: 8x8 grid, moving pieces, attack detection
 ├── game.js       Game class: turns, legal moves, check/mate, history
-└── main.js       DOM rendering and interaction handling (click & drag)
+├── main.js       DOM rendering and interaction handling (click & drag)
+└── IMAGE/
+    └── Pieces/                   Optional custom piece 
 ```
 
 ## Getting started
@@ -51,17 +117,8 @@ JavaScript, wrapped in a "royal candlelit salon" theme (gold, bronze, Cinzel).
 No installation or server required.
 
 1. Download or clone this repository.
-2. Keep all files at the same level (no subfolders).
+2. Keep all files at the same level (no subfolders), except `IMAGE/`.
 3. Open `index.html` in your browser (double-click works fine).
-
-Optional — run a small local server (handy if you later want to add images
-or network calls):
-
-```bash
-python3 -m http.server 8000
-```
-
-then open `http://localhost:8000`.
 
 ## How to play
 
@@ -74,24 +131,3 @@ then open `http://localhost:8000`.
 4. If a king is in check, it's highlighted in red and a message is shown.
 5. The game ends on checkmate or stalemate; a message announces the result.
 6. Click **New Game** at any time to restart.
-
-## Tech stack
-
-- HTML5 / CSS3
-- JavaScript (ES6, classes, no external dependencies)
-- [Cinzel](https://fonts.google.com/specimen/Cinzel) and
-  [EB Garamond](https://fonts.google.com/specimen/EB+Garamond) fonts via
-  Google Fonts
-
-
-  ## New Feature
-
-  - Rock
-
-  ![alt text](IMAGE/rock1.png)
-
-  ![alt text](IMAGE/rockdone.png)
-
-  ![alt text](IMAGE/rockX2.png)
-
-  ![alt text](IMAGE/rocknote.png)
