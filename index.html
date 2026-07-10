@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The chess Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;900&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="scene">
+    <header class="masthead">
+      <p class="masthead-eyebrow">Two players &middot; one board</p>
+      <h1 class="masthead-title">The chess Game</h1>
+      <p class="masthead-subtitle">An eternal duel of kings, waged sixty-four squares at a time.</p>
+    </header>
+
+    <div class="table">
+
+      <aside class="tray" id="captured-white">
+        <h3 class="tray-label">Fallen &mdash; White</h3>
+        <div class="tray-list" id="captured-white-list"></div>
+      </aside>
+
+      <div class="board-column">
+        <div class="status-row">
+          <div class="turn-indicator" id="turn-indicator">
+            <span class="turn-dot"></span>
+            <span id="turn-text">The Move Belongs To : White</span>
+          </div>
+          <div class="status" id="status"></div>
+        </div>
+
+        <div class="board-frame">
+          <div class="board-frame-inner">
+            <div class="board-grid-area">
+              <div class="rank-labels" id="rank-labels"></div>
+              <div class="board" id="board"></div>
+              <div class="corner-spacer"></div>
+              <div class="file-labels" id="file-labels"></div>
+            </div>
+          </div>
+          <span class="corner-flourish tl" aria-hidden="true"></span>
+          <span class="corner-flourish tr" aria-hidden="true"></span>
+          <span class="corner-flourish bl" aria-hidden="true"></span>
+          <span class="corner-flourish br" aria-hidden="true"></span>
+        </div>
+
+        <button id="restart-btn" class="btn-restart">New Game</button>
+      </div>
+
+      <aside class="tray" id="captured-black">
+        <h3 class="tray-label">Fallen &mdash; Black</h3>
+        <div class="tray-list" id="captured-black-list"></div>
+      </aside>
+
+    </div>
+
+    <div class="history-panel">
+      <h3 class="history-label">Chronicle of Blows</h3>
+      <ol id="move-history" class="history-list"></ol>
+    </div>
+
+  </div>
+
+  <script src="pieces.js"></script>
+  <script src="board.js"></script>
+  <script src="game.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
