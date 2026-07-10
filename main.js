@@ -9,6 +9,11 @@ const capturedBlackEl = document.getElementById('captured-black-list');
 const restartBtn = document.getElementById('restart-btn');
 const rankLabelsEl = document.getElementById('rank-labels');
 const fileLabelsEl = document.getElementById('file-labels');
+const promotionOverlayEl = document.getElementById('promotion-overlay');
+const promotionChoicesEl = document.getElementById('promotion-choices');
+
+// Coup en attente du choix de promotion du joueur (null si aucun).
+let pendingPromotion = null;
 
 // Un piece "vide" par type, juste pour récupérer son glyphe d'affichage
 // (aucune règle de déplacement n'est utilisée ici).
@@ -53,7 +58,7 @@ function renderBoard() {
         pieceEl.className = `piece piece-${piece.color}`;
         pieceEl.textContent = piece.glyph;
 
-        if (!game.isGameOver && piece.color === game.currentTurn) {
+        if (!game.isGameOver && !pendingPromotion && piece.color === game.currentTurn) {
           pieceEl.draggable = true;
           pieceEl.addEventListener('dragstart', (e) => onDragStart(e, row, col));
           pieceEl.addEventListener('dragend', () => onDragEnd());
@@ -82,7 +87,67 @@ function renderBoard() {
   }
 }
 
+// Tente de jouer un coup depuis fromRow/fromCol vers toRow/toCol.
+// Si ce coup est une promotion de pion, ouvre le sélecteur de pièce au lieu
+// de jouer le coup immédiatement (le coup est finalisé quand le joueur
+// choisit une pièce, voir resolvePromotion).
+function attemptMove(fromRow, fromCol, toRow, toCol) {
+  const isLegal = game.getLegalMoves(fromRow, fromCol).some(([r, c]) => r === toRow && c === toCol);
+  if (!isLegal) return false;
+
+  if (game.isPromotionMove(fromRow, fromCol, toRow)) {
+    openPromotionPicker(fromRow, fromCol, toRow, toCol);
+    return true;
+  }
+
+  return game.makeMove(fromRow, fromCol, toRow, toCol);
+}
+
+function openPromotionPicker(fromRow, fromCol, toRow, toCol) {
+  pendingPromotion = { fromRow, fromCol, toRow, toCol };
+
+  const color = game.board.getPiece(fromRow, fromCol).color;
+  const choices = ['queen', 'rook', 'bishop', 'knight'];
+
+  promotionChoicesEl.innerHTML = '';
+  for (const type of choices) {
+    const PieceClass = PIECE_CLASSES[type];
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'promotion-choice';
+    button.setAttribute('aria-label', capitalize(type));
+
+    const glyphEl = document.createElement('span');
+    glyphEl.className = `piece piece-${color}`;
+    glyphEl.textContent = new PieceClass(color).glyph;
+    button.appendChild(glyphEl);
+
+    const labelEl = document.createElement('span');
+    labelEl.className = 'promotion-choice-label';
+    labelEl.textContent = capitalize(type);
+    button.appendChild(labelEl);
+
+    button.addEventListener('click', () => resolvePromotion(type));
+    promotionChoicesEl.appendChild(button);
+  }
+
+  promotionOverlayEl.classList.add('visible');
+}
+
+function resolvePromotion(promotionType) {
+  if (!pendingPromotion) return;
+
+  const { fromRow, fromCol, toRow, toCol } = pendingPromotion;
+  pendingPromotion = null;
+  promotionOverlayEl.classList.remove('visible');
+
+  game.makeMove(fromRow, fromCol, toRow, toCol, promotionType);
+  game.selectedSquare = null;
+  renderAll();
+}
+
 function onDragStart(e, row, col) {
+  if (pendingPromotion) return;
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('text/plain', `${row},${col}`);
   e.currentTarget.classList.add('dragging');
@@ -105,17 +170,19 @@ function onDragEnd() {
 
 function onDrop(e, row, col) {
   e.preventDefault();
+  if (pendingPromotion) return;
+
   const data = e.dataTransfer.getData('text/plain');
   if (!data) return;
 
   const [fromRow, fromCol] = data.split(',').map(Number);
-  game.makeMove(fromRow, fromCol, row, col);
+  attemptMove(fromRow, fromCol, row, col);
   game.selectedSquare = null;
   renderAll();
 }
 
 function onSquareClick(row, col) {
-  if (game.isGameOver) return;
+  if (game.isGameOver || pendingPromotion) return;
 
   const clickedPiece = game.board.getPiece(row, col);
 
@@ -125,7 +192,7 @@ function onSquareClick(row, col) {
     if (selRow === row && selCol === col) {
       game.selectedSquare = null;
     } else {
-      const moved = game.makeMove(selRow, selCol, row, col);
+      const moved = attemptMove(selRow, selCol, row, col);
       if (moved) {
         game.selectedSquare = null;
       } else if (clickedPiece && clickedPiece.color === game.currentTurn) {
@@ -220,6 +287,8 @@ function renderAll() {
 
 restartBtn.addEventListener('click', () => {
   game.reset();
+  pendingPromotion = null;
+  promotionOverlayEl.classList.remove('visible');
   renderAll();
 });
 

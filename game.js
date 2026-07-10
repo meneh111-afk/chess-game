@@ -60,8 +60,18 @@ class Game {
     return this.board.isSquareAttacked(kingPos[0], kingPos[1], this.getOpponentColor(color));
   }
 
+  // Un coup donné fait-il arriver un pion sur la dernière rangée ?
+  isPromotionMove(fromRow, fromCol, toRow) {
+    const piece = this.board.getPiece(fromRow, fromCol);
+    if (!piece || piece.type !== 'pawn') return false;
+    const promotionRow = piece.color === 'white' ? 0 : 7;
+    return toRow === promotionRow;
+  }
+
   // Tente de jouer un coup. Retourne true si le coup a été joué.
-  makeMove(fromRow, fromCol, toRow, toCol) {
+  // promotionType : type choisi si ce coup est une promotion de pion
+  // ('queen' par défaut si non précisé).
+  makeMove(fromRow, fromCol, toRow, toCol, promotionType = 'queen') {
     if (this.isGameOver) return false;
 
     const legalMoves = this.getLegalMoves(fromRow, fromCol);
@@ -69,9 +79,10 @@ class Game {
     if (!isLegal) return false;
 
     const piece = this.board.getPiece(fromRow, fromCol);
-    const notation = this._toNotation(piece, fromRow, fromCol, toRow, toCol);
+    const isPromotion = this.isPromotionMove(fromRow, fromCol, toRow);
+    const notation = this._toNotation(piece, fromRow, fromCol, toRow, toCol, isPromotion ? promotionType : null);
 
-    const captured = this.board.movePiece(fromRow, fromCol, toRow, toCol);
+    const captured = this.board.movePiece(fromRow, fromCol, toRow, toCol, promotionType);
     if (captured) {
       this.capturedPieces[captured.color].push(captured);
       this.lastCapturingPiece[piece.color] = piece.type;
@@ -103,13 +114,17 @@ class Game {
     }
   }
 
-  _toNotation(piece, fromRow, fromCol, toRow, toCol) {
+  _toNotation(piece, fromRow, fromCol, toRow, toCol, promotionType = null) {
     if (piece.type === 'king' && Math.abs(toCol - fromCol) === 2) {
       return toCol > fromCol ? 'O-O' : 'O-O-O';
     }
     const files = 'abcdefgh';
     const from = files[fromCol] + (8 - fromRow);
     const to = files[toCol] + (8 - toRow);
+    if (promotionType) {
+      const PROMOTION_LETTERS = { queen: 'Q', rook: 'R', bishop: 'B', knight: 'N' };
+      return `${piece.symbol} ${from}-${to}=${PROMOTION_LETTERS[promotionType] || 'Q'}`;
+    }
     return `${piece.symbol} ${from}-${to}`;
   }
 

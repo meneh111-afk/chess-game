@@ -32,7 +32,10 @@ class Board {
     this.grid[row][col] = piece;
   }
 
-  movePiece(fromRow, fromCol, toRow, toCol) {
+  // Déplace une pièce et retourne la pièce capturée (ou null).
+  // promotionType ('queen' par défaut) : type de pièce choisi si ce coup
+  // fait arriver un pion sur la dernière rangée.
+  movePiece(fromRow, fromCol, toRow, toCol, promotionType = 'queen') {
     const piece = this.getPiece(fromRow, fromCol);
     const captured = this.getPiece(toRow, toCol);
 
@@ -57,7 +60,9 @@ class Board {
       if (piece.type === 'pawn') {
         const promotionRow = piece.color === 'white' ? 0 : 7;
         if (toRow === promotionRow) {
-          this.grid[toRow][toCol] = new Queen(piece.color);
+          const PROMOTION_CLASSES = { queen: Queen, rook: Rook, bishop: Bishop, knight: Knight };
+          const PromotionClass = PROMOTION_CLASSES[promotionType] || Queen;
+          this.grid[toRow][toCol] = new PromotionClass(piece.color);
         }
       }
     }

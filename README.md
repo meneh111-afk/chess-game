@@ -4,35 +4,41 @@ A 2-player chess game that runs entirely in the browser, with no backend:
 the board, rules, and interface are all built in plain, object-oriented
 JavaScript, wrapped in a royal theme (gold, bronze, Cinzel).
 
-
 ## Features
 
 - 8x8 board generated dynamically in JavaScript
 - Object-oriented piece classes (`Piece` as the base class, extended by
   `Pawn`, `Rook`, `Knight`, `Bishop`, `Queen`, `King`)
+
 ![alt text](IMAGE/firstpannel.png)
 
-- Full per-piece movement rules (including pawn promotion to Queen)
-- Castling (kingside and queenside), with all standard safety checks
+- Full per-piece movement rules, including pawn promotion — the player
+  chooses Queen, Rook, Bishop, or Knight via an on-screen picker (see
+  [Promotion](#promotion) below)
+- Castling (kingside and queenside), with all standard safety checks (see
+  [Castling](#castling) below)
 - Check, checkmate, and stalemate (draw) detection
 - A player can never make a move that would leave their own king in check
 - Turn switching (White / Black)
+
 ![alt text](IMAGE/turnswitch.png)
 
 - Move history panel
+
 ![alt text](IMAGE/history.png)
 
 - Captured pieces displayed on dedicated trays
+
 ![alt text](IMAGE/fallen.png)
 
 - Piece selection with legal-move and capture highlighting
+
 ![alt text](IMAGE/legalmove.png)
 
 - Drag & drop (HTML5 Drag & Drop API), in addition to click-to-move
-
 - Board coordinates (a-h / 8-1) shown along the edges
-
 - "New Game" button to restart
+
 ![alt text](IMAGE/newgame.png)
 
 - Custom visual theme (gold/bronze palette, Cinzel typeface, ornate frame)
@@ -63,16 +69,20 @@ the other side of it.*
 *Detail: the move is only offered when it's actually legal (king and rook
 haven't moved, path is clear, king isn't in or passing through check).*
 
+## Promotion
+
+When a pawn reaches the last rank an on-screen picker opens and the game waits for the player to choose which piece it becomes: Queen, Rook, Bishop, or Knight. The board doesn't update until a choice is made, and the move history records the exact promotion, not just a default queen.
+
+![alt text](IMAGE/promotion1.png)
+
+![alt text](IMAGE/promotion2.png)
+
 ## Visual customization
-
-
-![alt text](IMAGE/image.png)
-
 
 ![alt text](IMAGE/image-1.png)
 
+![alt text](IMAGE/pictadd.png)
 
-![adding some picts](IMAGE/pictadd.png)
 Below each "Fallen" tray, a medallion shows the piece that struck the last
 blow for that side, and a large themed image can fill the empty margins on
 each side of the screen.
@@ -90,13 +100,10 @@ white-queen.png   black-queen.png
 white-king.png    black-king.png
 ```
 
-If a file is missing, the game falls back to the vector glyph automatically. Nothing breaks
+If a file is missing, the game falls back to the vector glyph automatically
+nothing breaks.
 
-## Known limitations / future improvements
-
-- En passant is not implemented
-- No choice of promotion piece (always promotes to Queen)
-- No game save between sessions
+![alt text](IMAGE/pictadd2.png)
 
 ## Project structure
 
@@ -109,7 +116,8 @@ If a file is missing, the game falls back to the vector glyph automatically. Not
 ├── game.js       Game class: turns, legal moves, check/mate, history
 ├── main.js       DOM rendering and interaction handling (click & drag)
 └── IMAGE/
-    └── Pieces/                   Optional custom piece 
+    ├── *.png                      Screenshots used throughout this README
+    └── Pieces/                    Optional custom piece portraits (see above)
 ```
 
 ## Getting started
@@ -132,14 +140,15 @@ No installation or server required.
 5. The game ends on checkmate or stalemate; a message announces the result.
 6. Click **New Game** at any time to restart.
 
+## Tech stack
 
+- HTML5 / CSS3
+- JavaScript (ES6, classes, no external dependencies)
+- [Cinzel](https://fonts.google.com/specimen/Cinzel) and
+  [EB Garamond](https://fonts.google.com/specimen/EB+Garamond) fonts via
+  Google Fonts
 
-
-
-
-
-
-
+---
 
 # Online chess game
 

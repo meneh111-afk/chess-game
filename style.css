@@ -597,3 +597,80 @@ body {
     animation: none;
   }
 }
+
+/* ==========================================================================
+   Promotion picker
+   ========================================================================== */
+
+.promotion-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 4, 3, .78);
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.promotion-overlay.visible {
+  display: flex;
+}
+
+.promotion-modal {
+  background: linear-gradient(155deg, #f0e6cc, #d9c9a3 100%);
+  border: 2px solid var(--text-gold);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(255, 255, 255, .3);
+  padding: 28px 32px;
+  text-align: center;
+}
+
+.promotion-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #5c3e1a;
+  margin: 0 0 20px;
+}
+
+.promotion-choices {
+  display: flex;
+  gap: 14px;
+}
+
+.promotion-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 84px;
+  padding: 14px 8px;
+  background: linear-gradient(180deg, #fbf5e6, #e8dcc0);
+  border: 1px solid var(--border-bronze);
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, transform .15s ease;
+}
+
+.promotion-choice:hover,
+.promotion-choice:focus-visible {
+  background: linear-gradient(180deg, #fff8e8, #f0dfb8);
+  border-color: var(--text-gold);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+/* Sur ce fond clair, on force un glyphe bronze foncé quelle que soit la
+   couleur réelle de la pièce (un pion blanc plein serait invisible ici). */
+.promotion-choice .piece {
+  font-size: 40px;
+  color: #4a3524 !important;
+  -webkit-text-stroke: 0;
+}
+
+.promotion-choice-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #6a5326;
+}
